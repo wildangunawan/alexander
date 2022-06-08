@@ -1,6 +1,5 @@
 #include "actuators.h"
 #include "constants.cpp"
-#include <cmath>
 
 void setupActuators() {
     // Motor DC
@@ -32,8 +31,8 @@ void controlSpeed(int speedL = 0, int speedR = 0) {
      * @param int speedR
      */
 
-    int pwmL = convertPercentageToPWM(abs(speedL));
-    int pwmR = convertPercentageToPWM(abs(speedR));
+    int pwmL = convertPercentageToPWM(speedL > 0 ? speedL : -speedL);
+    int pwmR = convertPercentageToPWM(speedR > 0 ? speedR : -speedR);
 
     // Motor A - Kiri
     if (speedL > 0) {
