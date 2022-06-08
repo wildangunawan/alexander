@@ -15,7 +15,7 @@ void loop() {
   // If distance to object is less than 10 cm OR
   // IRs don't detect anything then STOP
   if (readUltrasonicData() < 30) {
-    berhenti();
+    controlSpeed(0, 0);
     return;
   }
 
@@ -66,13 +66,13 @@ void basicLineFollower() {
   // Belok kiri setengah-setengah
   else if (readMiddleLeftIRData() && readRightIRData()) {
     lastFound = -1;
-    controlSpeed(-20, 10);
+    controlSpeed(0, 10);
   }
 
   // Belok kanan setengah-setengah
   else if (!readLeftIRData() && readMiddleRightIRData()) {
     lastFound = 1;
-    controlSpeed(10, -20);
+    controlSpeed(10, 0);
   }
 
   // Belok kanan 90 degree
@@ -84,8 +84,26 @@ void basicLineFollower() {
   // Lurus
   else if (readCenterIRData()) {
     lastFound = 0;
-    controlSpeed(20, 20);
+    if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5) {
+      controlSpeed(20, 20);
+    } else if (readCenterIRData() == 2) {
+      controlSpeed(0, 10);
+    } else if (readCenterIRData() == 4) {
+      controlSpeed(10, 0);
+    }
   }
+}
+
+void toTry1() {
+  controlSpeed(100, 100);
+  delay(1000 * 5);
+  controlSpeed(0, 0);
+}
+
+void toTry2() {
+  controlSpeed(20, 20);
+  delay(1000 * 5);
+  controlSpeed(0, 0);
 }
 
 void runTask() {
