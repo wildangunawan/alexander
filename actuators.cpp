@@ -1,7 +1,8 @@
 #include "actuators.h"
 #include "constants.cpp"
 
-void setupActuators() {
+void setupActuators()
+{
     // Motor DC
     pinMode(ENA, OUTPUT);
     pinMode(ENB, OUTPUT);
@@ -11,7 +12,8 @@ void setupActuators() {
     pinMode(IN4, OUTPUT);
 }
 
-int convertPercentageToPWM(int value) {
+int convertPercentageToPWM(int value)
+{
     /**
      * Convert the percentage to PWM value.
      *
@@ -23,7 +25,8 @@ int convertPercentageToPWM(int value) {
 }
 
 // MOTOR DC FUNCTIONS
-void controlSpeed(int speedL = 0, int speedR = 0) {
+void controlSpeed(int speedL = 0, int speedR = 0)
+{
     /**
      * Control the speed of the motors.
      *
@@ -36,19 +39,25 @@ void controlSpeed(int speedL = 0, int speedR = 0) {
 
     // Somehow A is RIGHT and B is LEFT
     // Motor A - Kanan
-    if (speedR > 0) {
+    if (speedR > 0)
+    {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
-    } else {
+    }
+    else
+    {
         digitalWrite(IN1, LOW);
         digitalWrite(IN2, HIGH);
     }
 
     // Motor B - Kiri
-    if (speedL > 0) {
+    if (speedL > 0)
+    {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
-    } else {
+    }
+    else
+    {
         digitalWrite(IN3, LOW);
         digitalWrite(IN4, HIGH);
     }
