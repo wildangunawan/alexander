@@ -1,17 +1,6 @@
 #include "alexander.h"
 
 int dari_home = 1;
-int left_home = 0;
-int right_home = 0;
-
-int perempatan = 0;
-int pertigaan = 0;
-
-int garis_kanan = 0;
-int garis_kiri = 0;
-
-int masih_detect_kiri = 0;
-int masih_detect_kanan = 0;
 
 /**
  * Last found line:
@@ -97,74 +86,110 @@ void basicLineFollower()
     }
 }
 
+int T_JUNCTION = 1;
+int LEFT_JUNCTION = 2;
+int RIGHT_JUNCTION = 3;
+
+void find(int type, int pass_through = 1)
+{
+    int left_found = 0;
+    int right_found = 0;
+
+    if (type == T_JUNCTION)
+    {
+        while (left_found == 0 && right_found == 0)
+        {
+            if (readLeftIRData() == 1)
+            {
+                left_found = 1;
+            }
+            if (readRightIRData() == 1)
+            {
+                right_found = 1;
+            }
+
+            basicLineFollower();
+        }
+
+        if (pass_through)
+        {
+            while (readLeftIRData() == 1 && readRightIRData() == 1)
+            {
+                basicLineFollower();
+            }
+        }
+    }
+    else if (type == LEFT_JUNCTION)
+    {
+        while (left_found == 0)
+        {
+            if (readLeftIRData() == 1)
+            {
+                left_found = 1;
+            }
+
+            basicLineFollower();
+        }
+
+        if (pass_through)
+        {
+            while (readLeftIRData() == 1)
+            {
+                basicLineFollower();
+            }
+        }
+    }
+    else if (type == RIGHT_JUNCTION)
+    {
+        while (right_found == 0)
+        {
+            if (readRightIRData() == 1)
+            {
+                left_found = 1;
+            }
+
+            basicLineFollower();
+        }
+
+        if (pass_through)
+        {
+            while (readRightIRData() == 1)
+            {
+                basicLineFollower();
+            }
+        }
+    }
+}
+
 void runTask()
 {
-    int runLineFollower = 1;
-
-    // If from home and right IR detect a line, then turn right
+    // Dari home, kita akan find T-Junction di border home
     if (dari_home)
     {
-        // Forget about all first detected left and right
-        if (readLeftIRData())
-            left_home = 1;
-        if (readRightIRData())
-            right_home = 1;
+        find(T_JUNCTION);
+        dari_home = 0;
 
-        // Detect first pertigaan, belok kanan
-        if (left_home && right_home && !readLeftIRData() && readRightIRData())
-        {
-            turnRightUntilCenter();
-            dari_home = 0;
-        }
+        // Selanjutnya, kita akan ketemu Right Junction dan belok ke kanan
+        find(RIGHT_JUNCTION);
+        turnRightUntilCenter();
     }
-    else
+
+    // Sudah masuk ke daerah perempatan, kita cari T-Junction sebanyak 5x
+    for (int i = 0; i < 5; i++)
     {
-        if (perempatan >= 5)
-        {
-            turnLeftUntilCenter();
-            lastFound = -2;
-        }
-
-        if (pertigaan >= 3)
-        {
-            pertigaan = 0;
-            perempatan = 0;
-
-            turnLeftUntilCenter();
-            lastFound = -2;
-        }
-
-        // Count pertigaan
-        if ((readLeftIRData() || readRightIRData()) && readCenterIRData())
-        {
-            if (readLeftIRData() && !masih_detect_kiri)
-            {
-                garis_kiri++;
-                masih_detect_kiri = 1;
-            }
-            else if (!readLeftIRData())
-                masih_detect_kiri = 0;
-
-            if (readRightIRData() && !masih_detect_kanan)
-            {
-                garis_kanan++;
-                masih_detect_kanan = 1;
-            }
-            else if (!readRightIRData())
-                masih_detect_kanan = 0;
-
-            if (garis_kiri == garis_kanan && garis_kiri != 0 && garis_kanan != 0)
-            {
-                perempatan++;
-                garis_kiri = 0;
-                garis_kanan = 0;
-            }
-
-            if ((garis_kiri || garis_kanan) && perempatan >= 5)
-                pertigaan++;
-        }
+        find(T_JUNCTION);
     }
 
-    if (runLineFollower)
-        basicLineFollower();
+    // Find last T-Junction, kanan ke trolley, kiri ke jalanan biasa
+    find(T_JUNCTION, 0);
+    turnLeftUntilCenter();
+
+    // Di jalanan biasa, akan ada 2x Left Junction dan 1x Right Junction
+    find(LEFT_JUNCTION);
+    find(RIGHT_JUNCTION);
+    find(LEFT_JUNCTION);
+
+    // Kita kembali ke awal lagi, find Left Junction dekat home
+    find(LEFT_JUNCTION, 0);
+    turnLeftUntilCenter();
 }
