@@ -19,7 +19,7 @@ int convertPercentageToPWM(int value) {
      * @return int PWM value
      */
 
-    return value * 255 / 255;
+    return value * 255 / 100;
 }
 
 // MOTOR DC FUNCTIONS
@@ -34,8 +34,9 @@ void controlSpeed(int speedL = 0, int speedR = 0) {
     int pwmL = convertPercentageToPWM(speedL > 0 ? speedL : -speedL);
     int pwmR = convertPercentageToPWM(speedR > 0 ? speedR : -speedR);
 
-    // Motor A - Kiri
-    if (speedL > 0) {
+    // Somehow A is RIGHT and B is LEFT
+    // Motor A - Kanan
+    if (speedR > 0) {
         digitalWrite(IN1, HIGH);
         digitalWrite(IN2, LOW);
     } else {
@@ -43,8 +44,8 @@ void controlSpeed(int speedL = 0, int speedR = 0) {
         digitalWrite(IN2, HIGH);
     }
 
-    // Motor B - Kanan
-    if (speedR > 0) {
+    // Motor B - Kiri
+    if (speedL > 0) {
         digitalWrite(IN3, HIGH);
         digitalWrite(IN4, LOW);
     } else {
@@ -53,6 +54,6 @@ void controlSpeed(int speedL = 0, int speedR = 0) {
     }
 
     // Write speed
-    analogWrite(ENA, pwmL);
-    analogWrite(ENB, pwmR);
+    analogWrite(ENA, pwmR);
+    analogWrite(ENB, pwmL);
 }
