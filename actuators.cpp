@@ -66,3 +66,24 @@ void controlSpeed(int speedL = 0, int speedR = 0)
     analogWrite(ENA, pwmR);
     analogWrite(ENB, pwmL);
 }
+void turnRightUntilCenter()
+{
+    controlSpeed(60, -60);
+    delay(300);
+
+    while (readCenterIRData() != 3 || readCenterIRData() != 4)
+    {
+        controlSpeed(60, -60);
+    }
+}
+
+void turnLeftUntilCenter()
+{
+    controlSpeed(-60, 60);
+    delay(300);
+
+    while (readCenterIRData() != 1 || readCenterIRData() != 2)
+    {
+        controlSpeed(-60, 60);
+    }
+}
