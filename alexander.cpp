@@ -121,8 +121,6 @@ void runTask()
     {
         if (perempatan >= 5)
         {
-            perempatan = 0;
-
             turnLeftUntilCenter();
             lastFound = -2;
         }
@@ -130,6 +128,7 @@ void runTask()
         if (pertigaan >= 3)
         {
             pertigaan = 0;
+            perempatan = 0;
 
             turnLeftUntilCenter();
             lastFound = -2;
@@ -143,7 +142,7 @@ void runTask()
                 garis_kiri++;
                 masih_detect_kiri = 1;
             }
-            else
+            else if (!readLeftIRData())
                 masih_detect_kiri = 0;
 
             if (readRightIRData() && !masih_detect_kanan)
@@ -151,7 +150,7 @@ void runTask()
                 garis_kanan++;
                 masih_detect_kanan = 1;
             }
-            else
+            else if (!readRightIRData())
                 masih_detect_kanan = 0;
 
             if (garis_kiri == garis_kanan && garis_kiri != 0 && garis_kanan != 0)
@@ -161,8 +160,8 @@ void runTask()
                 garis_kanan = 0;
             }
 
-            if (garis_kiri == 2 && garis_kanan == 1)
-                pertigaan = 3;
+            if ((garis_kiri || garis_kanan) && perempatan >= 5)
+                pertigaan++;
         }
     }
 
