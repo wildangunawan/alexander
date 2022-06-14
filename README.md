@@ -1,4 +1,4 @@
-## Alexander
+## Alexander - Alat Extraksi Angkut Sederhana
 
 Alexander is a line follower robot built for Eksperimen Robotika 1 at Teknik Robotika dan Kecerdasan Buatan Universitas Airlangga. Its main functionality is to follow line and pull a trolley all over the arena.
 
