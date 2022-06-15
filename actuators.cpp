@@ -69,27 +69,27 @@ void controlSpeed(int speedL = 0, int speedR = 0)
 void turnRightUntilCenter()
 {
     uint32_t time_start = millis();
-    while (millis() - time_start < 500)
+    while (millis() - time_start < 300)
     {
-        controlSpeed(60, -60);
+        controlSpeed(75, 0);
     }
 
-    while (readCenterIRData() != 3 || readCenterIRData() != 4)
+    while (readCenterIRData() != 3 && readCenterIRData() != 4)
     {
-        controlSpeed(45, -20);
+        controlSpeed(60, 0);
     }
 }
 
 void turnLeftUntilCenter()
 {
     uint32_t time_start = millis();
-    while (millis() - time_start < 500)
+    while (millis() - time_start < 300)
     {
-        controlSpeed(-60, 60);
+        controlSpeed(0, 60);
     }
 
-    while (readCenterIRData() != 1 || readCenterIRData() != 2)
+    while (readCenterIRData() != 1 && readCenterIRData() != 2)
     {
-        controlSpeed(-20, 45);
+        controlSpeed(0, 45);
     }
 }

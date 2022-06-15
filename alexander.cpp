@@ -61,11 +61,11 @@ void basicLineFollower()
     }
 
     // Belok kanan 90 degree
-    else if (!readLeftIRData() && readRightIRData())
-    {
-        lastFound = 2;
-        controlSpeed(60, -60);
-    }
+    //    else if (!readLeftIRData() && readRightIRData())
+    //    {
+    //        lastFound = 2;
+    //        controlSpeed(60, -60);
+    //    }
 
     // Lurus
     else if (readCenterIRData())
@@ -90,14 +90,14 @@ int T_JUNCTION = 1;
 int LEFT_JUNCTION = 2;
 int RIGHT_JUNCTION = 3;
 
-void find(int type, int pass_through = 1)
+void find_line(int type, int pass_through = 1)
 {
     int left_found = 0;
     int right_found = 0;
 
     if (type == T_JUNCTION)
     {
-        while (left_found == 0 && right_found == 0)
+        while (left_found == 0 || right_found == 0)
         {
             if (readLeftIRData() == 1)
             {
@@ -145,7 +145,7 @@ void find(int type, int pass_through = 1)
         {
             if (readRightIRData() == 1)
             {
-                left_found = 1;
+                right_found = 1;
             }
 
             basicLineFollower();
@@ -164,32 +164,46 @@ void find(int type, int pass_through = 1)
 void runTask()
 {
     // Dari home, kita akan find T-Junction di border home
-    if (dari_home)
+    if (dari_home == 1)
     {
-        find(T_JUNCTION);
+        find_line(T_JUNCTION);
+        controlSpeed(0, 0);
+        delay(300);
         dari_home = 0;
 
         // Selanjutnya, kita akan ketemu Right Junction dan belok ke kanan
-        find(RIGHT_JUNCTION);
+        find_line(RIGHT_JUNCTION);
+        controlSpeed(0, 0);
+        delay(300);
         turnRightUntilCenter();
     }
 
     // Sudah masuk ke daerah perempatan, kita cari T-Junction sebanyak 5x
     for (int i = 0; i < 5; i++)
     {
-        find(T_JUNCTION);
+        find_line(T_JUNCTION);
+        controlSpeed(0, 0);
+        delay(300);
     }
 
     // Find last T-Junction, kanan ke trolley, kiri ke jalanan biasa
-    find(T_JUNCTION, 0);
+    find_line(T_JUNCTION);
+    controlSpeed(0, 0);
     turnLeftUntilCenter();
 
     // Di jalanan biasa, akan ada 2x Left Junction dan 1x Right Junction
-    find(LEFT_JUNCTION);
-    find(RIGHT_JUNCTION);
-    find(LEFT_JUNCTION);
+    find_line(LEFT_JUNCTION);
+    controlSpeed(0, 0);
+
+    find_line(RIGHT_JUNCTION);
+    controlSpeed(0, 0);
+
+    find_line(LEFT_JUNCTION);
+    controlSpeed(0, 0);
 
     // Kita kembali ke awal lagi, find Left Junction dekat home
-    find(LEFT_JUNCTION, 0);
+    find_line(LEFT_JUNCTION);
+    controlSpeed(0, 0);
+    delay(500);
     turnLeftUntilCenter();
 }
