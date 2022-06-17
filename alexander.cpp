@@ -80,11 +80,11 @@ void find_line(int type, int pass_through = 1)
     {
         while (left_found == 0 || right_found == 0)
         {
-            if (readLeftIRData() == 1)
+            if (readLeftIRData() == 1 && (readCenterIRData() == 1 || readCenterIRData() == 2))
             {
                 left_found = 1;
             }
-            if (readRightIRData() == 1)
+            if (readRightIRData() == 1 && (readCenterIRData() == 3 || readCenterIRData() == 4))
             {
                 right_found = 1;
             }
@@ -104,7 +104,7 @@ void find_line(int type, int pass_through = 1)
     {
         while (left_found == 0)
         {
-            if (readLeftIRData() == 1)
+            if (readLeftIRData() == 1 && (readCenterIRData() == 1 || readCenterIRData() == 2))
             {
                 left_found = 1;
             }
@@ -124,7 +124,7 @@ void find_line(int type, int pass_through = 1)
     {
         while (right_found == 0)
         {
-            if (readRightIRData() == 1)
+            if (readRightIRData() == 1 && (readCenterIRData() == 3 || readCenterIRData() == 4))
             {
                 right_found = 1;
             }
