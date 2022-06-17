@@ -1,17 +1,5 @@
 #include "alexander.h"
-
-int dari_home = 1;
-int left_home = 0;
-int right_home = 0;
-
-int perempatan = 0;
-int pertigaan = 0;
-
-int garis_kanan = 0;
-int garis_kiri = 0;
-
-int masih_detect_kiri = 0;
-int masih_detect_kanan = 0;
+#include "constants.cpp"
 
 /**
  * Last found line:
@@ -50,13 +38,6 @@ void basicLineFollower()
         }
     }
 
-    // Belok kiri 90 degree
-    else if (readLeftIRData() && !readRightIRData())
-    {
-        lastFound = -2;
-        controlSpeed(-60, 60);
-    }
-
     // Belok kiri setengah-setengah
     else if (readMiddleLeftIRData() && !readRightIRData())
     {
@@ -71,20 +52,13 @@ void basicLineFollower()
         controlSpeed(65, 0);
     }
 
-    // Belok kanan 90 degree
-    else if (!readLeftIRData() && readRightIRData())
-    {
-        lastFound = 2;
-        controlSpeed(60, -60);
-    }
-
     // Lurus
     else if (readCenterIRData())
     {
         lastFound = 0;
         if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
         {
-            controlSpeed(60, 60);
+            controlSpeed(50, 50);
         }
         else if (readCenterIRData() == 2)
         {
@@ -97,74 +71,73 @@ void basicLineFollower()
     }
 }
 
-void runTask()
+void find_line(int type, int pass_through = 1)
 {
-    int runLineFollower = 1;
+    int left_found = 0;
+    int right_found = 0;
 
-    // If from home and right IR detect a line, then turn right
-    if (dari_home)
+    if (type == T_JUNCTION)
     {
-        // Forget about all first detected left and right
-        if (readLeftIRData())
-            left_home = 1;
-        if (readRightIRData())
-            right_home = 1;
-
-        // Detect first pertigaan, belok kanan
-        if (left_home && right_home && !readLeftIRData() && readRightIRData())
+        while (left_found == 0 || right_found == 0)
         {
-            turnRightUntilCenter();
-            dari_home = 0;
+            if (readLeftIRData() == 1)
+            {
+                left_found = 1;
+            }
+            if (readRightIRData() == 1)
+            {
+                right_found = 1;
+            }
+
+            basicLineFollower();
+        }
+
+        if (pass_through)
+        {
+            while (readLeftIRData() == 1 && readRightIRData() == 1)
+            {
+                basicLineFollower();
+            }
         }
     }
-    else
+    else if (type == LEFT_JUNCTION)
     {
-        if (perempatan >= 5)
+        while (left_found == 0)
         {
-            turnLeftUntilCenter();
-            lastFound = -2;
+            if (readLeftIRData() == 1)
+            {
+                left_found = 1;
+            }
+
+            basicLineFollower();
         }
 
-        if (pertigaan >= 3)
+        if (pass_through)
         {
-            pertigaan = 0;
-            perempatan = 0;
-
-            turnLeftUntilCenter();
-            lastFound = -2;
-        }
-
-        // Count pertigaan
-        if ((readLeftIRData() || readRightIRData()) && readCenterIRData())
-        {
-            if (readLeftIRData() && !masih_detect_kiri)
+            while (readLeftIRData() == 1)
             {
-                garis_kiri++;
-                masih_detect_kiri = 1;
+                basicLineFollower();
             }
-            else if (!readLeftIRData())
-                masih_detect_kiri = 0;
-
-            if (readRightIRData() && !masih_detect_kanan)
-            {
-                garis_kanan++;
-                masih_detect_kanan = 1;
-            }
-            else if (!readRightIRData())
-                masih_detect_kanan = 0;
-
-            if (garis_kiri == garis_kanan && garis_kiri != 0 && garis_kanan != 0)
-            {
-                perempatan++;
-                garis_kiri = 0;
-                garis_kanan = 0;
-            }
-
-            if ((garis_kiri || garis_kanan) && perempatan >= 5)
-                pertigaan++;
         }
     }
+    else if (type == RIGHT_JUNCTION)
+    {
+        while (right_found == 0)
+        {
+            if (readRightIRData() == 1)
+            {
+                right_found = 1;
+            }
 
-    if (runLineFollower)
-        basicLineFollower();
+            basicLineFollower();
+        }
+
+        if (pass_through)
+        {
+            while (readRightIRData() == 1)
+            {
+                basicLineFollower();
+            }
+        }
+    }
 }

@@ -20,3 +20,8 @@ const int IN1 = 8;
 const int IN2 = 9;
 const int IN3 = 10;
 const int IN4 = 11;
+
+// types
+int T_JUNCTION = 1;
+int LEFT_JUNCTION = 2;
+int RIGHT_JUNCTION = 3;

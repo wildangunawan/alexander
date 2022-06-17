@@ -66,6 +66,7 @@ void controlSpeed(int speedL = 0, int speedR = 0)
     analogWrite(ENA, pwmR);
     analogWrite(ENB, pwmL);
 }
+
 void turnRightUntilCenter()
 {
     uint32_t time_start = millis();
@@ -91,5 +92,33 @@ void turnLeftUntilCenter()
     while (readCenterIRData() != 1 || readCenterIRData() != 2)
     {
         controlSpeed(-20, 45);
+    }
+}
+
+void turnRightCOGUntilCenter()
+{
+    uint32_t time_start = millis();
+    while (millis() - time_start < 300)
+    {
+        controlSpeed(75, -75);
+    }
+
+    while (readCenterIRData() != 3 && readCenterIRData() != 4)
+    {
+        controlSpeed(60, -60);
+    }
+}
+
+void turnLeftCOGUntilCenter()
+{
+    uint32_t time_start = millis();
+    while (millis() - time_start < 300)
+    {
+        controlSpeed(-60, 60);
+    }
+
+    while (readCenterIRData() != 1 && readCenterIRData() != 2)
+    {
+        controlSpeed(-45, 45);
     }
 }
