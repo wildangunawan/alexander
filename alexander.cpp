@@ -3,23 +3,34 @@
 
 /**
  * Last found line:
+ * -2 - left
  * -1 - left but so-so
  * 0 - center
  * 1 - right but so-so
+ * 2 - right
  */
 int lastFound = 0;
+int lastError = 0;
+const int Kp = 2;
+const int Kd = 0;
 
-void basicLineFollower()
+void basicLineFollower(int baseSpeed = 50)
 {
+    int error;
+
     if (readUltrasonicData() < 20)
     {
         controlSpeed(0, 0);
         return;
     }
 
-    if (!readMiddleLeftIRData() && !readCenterIRData() && !readMiddleRightIRData())
+    if (!readLeftIRData() && !readMiddleLeftIRData() && !readCenterIRData() && !readMiddleRightIRData() && !readRightIRData())
     {
-        if (lastFound == -1)
+        if (lastFound == 2)
+        {
+            controlSpeed(-50, 50);
+        }
+        else if (lastFound == -1)
         {
             controlSpeed(0, 50);
         }
@@ -31,38 +42,63 @@ void basicLineFollower()
         {
             controlSpeed(50, 0);
         }
-    }
-
-    // Belok kiri setengah-setengah
-    else if (readMiddleLeftIRData() && !readRightIRData())
-    {
-        lastFound = -1;
-        controlSpeed(0, 50);
-    }
-
-    // Belok kanan setengah-setengah
-    else if (!readLeftIRData() && readMiddleRightIRData())
-    {
-        lastFound = 1;
-        controlSpeed(50, 0);
-    }
-
-    // Lurus
-    else if (readCenterIRData())
-    {
-        lastFound = 0;
-        if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
+        else if (lastFound == 2)
         {
-            controlSpeed(50, 50);
+            controlSpeed(50, -50);
         }
-        else if (readCenterIRData() == 2)
+    }
+    else
+    {
+        // Lurus
+        if (readCenterIRData())
         {
-            controlSpeed(0, 50);
+            lastFound = 0;
+
+            if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
+                error = 0;
+            else if (readCenterIRData() == 2)
+                error = -10;
+            else if (readCenterIRData() == 4)
+                error = 10;
         }
-        else if (readCenterIRData() == 4)
+
+        // Kiri pojok
+        else if (readLeftIRData() && !readRightIRData())
         {
-            controlSpeed(50, 0);
+            lastFound = -2;
+            error = -50;
         }
+
+        // Kiri tengah
+        else if (readMiddleLeftIRData() && !readRightIRData())
+        {
+            lastFound = -1;
+            error = -25;
+        }
+
+        // Kanan tengah
+        else if (!readLeftIRData() && readMiddleRightIRData())
+        {
+            lastFound = 1;
+            error = 25;
+        }
+
+        // Kanan pojok
+        else if (readLeftIRData() && !readRightIRData())
+        {
+            lastFound = 2;
+            error = 50;
+        }
+
+        // Calculate derivative of the error
+        int DError = error - lastError;
+
+        // Calculate additional speed needed
+        int additionalSpeed = Kp * error + Kd * DError;
+        controlSpeed(baseSpeed + additionalSpeed, baseSpeed - additionalSpeed);
+
+        // Save current error as last error
+        int lastError = error;
     }
 }
 
