@@ -22,6 +22,6 @@ const int IN3 = 10;
 const int IN4 = 11;
 
 // types
-int T_JUNCTION = 1;
-int LEFT_JUNCTION = 2;
-int RIGHT_JUNCTION = 3;
+const int T_JUNCTION = 1;
+const int LEFT_JUNCTION = 2;
+const int RIGHT_JUNCTION = 3;
