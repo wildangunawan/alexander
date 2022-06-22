@@ -3,38 +3,33 @@
 
 /**
  * Last found line:
- * -2 - full left
  * -1 - left but so-so
  * 0 - center
  * 1 - right but so-so
- * 2 - full right
  */
 int lastFound = 0;
 
 void basicLineFollower()
 {
-    if (
-        readLeftIRData() == 0 && readMiddleLeftIRData() == 0 && readCenterIRData() == 0 && readMiddleRightIRData() == 0 && readRightIRData() == 0)
+    if (readUltrasonicData() < 20)
     {
-        if (lastFound == -2)
+        controlSpeed(0, 0);
+        return;
+    }
+
+    if (!readMiddleLeftIRData() && !readCenterIRData() && !readMiddleRightIRData())
+    {
+        if (lastFound == -1)
         {
-            controlSpeed(-60, 60);
-        }
-        else if (lastFound == -1)
-        {
-            controlSpeed(0, 65);
+            controlSpeed(0, 50);
         }
         else if (lastFound == 0)
         {
-            controlSpeed(60, 60);
+            controlSpeed(50, 50);
         }
         else if (lastFound == 1)
         {
-            controlSpeed(65, 0);
-        }
-        else if (lastFound == 2)
-        {
-            controlSpeed(60, -60);
+            controlSpeed(50, 0);
         }
     }
 
@@ -42,14 +37,14 @@ void basicLineFollower()
     else if (readMiddleLeftIRData() && !readRightIRData())
     {
         lastFound = -1;
-        controlSpeed(0, 65);
+        controlSpeed(0, 50);
     }
 
     // Belok kanan setengah-setengah
     else if (!readLeftIRData() && readMiddleRightIRData())
     {
         lastFound = 1;
-        controlSpeed(65, 0);
+        controlSpeed(50, 0);
     }
 
     // Lurus
@@ -62,11 +57,11 @@ void basicLineFollower()
         }
         else if (readCenterIRData() == 2)
         {
-            controlSpeed(0, 65);
+            controlSpeed(0, 50);
         }
         else if (readCenterIRData() == 4)
         {
-            controlSpeed(65, 0);
+            controlSpeed(50, 0);
         }
     }
 }
@@ -80,11 +75,11 @@ void find_line(int type, int pass_through = 1)
     {
         while (left_found == 0 || right_found == 0)
         {
-            if (readLeftIRData() == 1 && (readCenterIRData() == 1 || readCenterIRData() == 2))
+            if (readLeftIRData() == 1)
             {
                 left_found = 1;
             }
-            if (readRightIRData() == 1 && (readCenterIRData() == 3 || readCenterIRData() == 4))
+            if (readRightIRData() == 1)
             {
                 right_found = 1;
             }
@@ -102,9 +97,9 @@ void find_line(int type, int pass_through = 1)
     }
     else if (type == LEFT_JUNCTION)
     {
-        while (left_found == 0)
+        while (left_found == 0 || (left_found == 1 && !readMiddleLeftIRData()))
         {
-            if (readLeftIRData() == 1 && (readCenterIRData() == 1 || readCenterIRData() == 2))
+            if (readLeftIRData() && readCenterIRData())
             {
                 left_found = 1;
             }
@@ -122,9 +117,9 @@ void find_line(int type, int pass_through = 1)
     }
     else if (type == RIGHT_JUNCTION)
     {
-        while (right_found == 0)
+        while (right_found == 0 || (right_found == 1 && !readMiddleRightIRData()))
         {
-            if (readRightIRData() == 1 && (readCenterIRData() == 3 || readCenterIRData() == 4))
+            if (readRightIRData() && readCenterIRData())
             {
                 right_found = 1;
             }
