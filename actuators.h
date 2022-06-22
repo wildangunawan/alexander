@@ -4,6 +4,5 @@
 void setupActuators();
 void controlSpeed(int speedL = 0, int speedR = 0);
 void turnLeftUntilCenter();
-void turnLeftCOGUntilCenter();
 void turnRightUntilCenter();
-void turnRightCOGUntilCenter();
+void turn360UntilCenter();

@@ -95,30 +95,16 @@ void turnLeftUntilCenter()
     }
 }
 
-void turnRightCOGUntilCenter()
+void turn360UntilCenter()
 {
     uint32_t time_start = millis();
-    while (millis() - time_start < 300)
+    while (millis() - time_start < 1000)
     {
-        controlSpeed(75, -75);
+        controlSpeed(-100, 100);
     }
 
-    while (readCenterIRData() != 3 && readCenterIRData() != 4)
+    while (readCenterIRData() != 1 && readCenterIRData() != 3)
     {
-        controlSpeed(60, -60);
-    }
-}
-
-void turnLeftCOGUntilCenter()
-{
-    uint32_t time_start = millis();
-    while (millis() - time_start < 300)
-    {
-        controlSpeed(-60, 60);
-    }
-
-    while (readCenterIRData() != 1 && readCenterIRData() != 2)
-    {
-        controlSpeed(-45, 45);
+        controlSpeed(-75, 75);
     }
 }
