@@ -1,5 +1,9 @@
 #include "actuators.h"
 #include "constants.cpp"
+#include <Servo.h>
+
+Servo leftServo;
+Servo rightServo;
 
 void setupActuators()
 {
@@ -10,6 +14,10 @@ void setupActuators()
     pinMode(IN2, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
+
+    // Servo
+    leftServo.attach(LEFT_SERVO);
+    rightServo.attach(RIGHT_SERVO);
 }
 
 int convertPercentageToPWM(int value)
@@ -116,4 +124,29 @@ void turn360UntilCenter()
     {
         controlSpeed(-75, 75);
     }
+}
+
+// SERVO MOTOR FUNCTIONS
+void controlServo(int leftAngle = 0, int rightAngle = 0)
+{
+    /**
+     * Control the servo motor.
+     *
+     * @param int left angle
+     * @param int right angle
+     */
+
+    if (leftAngle > 180)
+        leftAngle = 180;
+    else if (leftAngle < 0)
+        leftAngle = 0;
+
+    if (rightAngle > 180)
+        rightAngle = 180;
+    else if (rightAngle < 0)
+        rightAngle = 0;
+
+    // Push data
+    leftServo.write(leftAngle);
+    rightServo.write(rightAngle);
 }
