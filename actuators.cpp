@@ -1,5 +1,9 @@
 #include "actuators.h"
 #include "constants.cpp"
+#include <Servo.h>
+
+Servo leftServo;
+Servo rightServo;
 
 void setupActuators()
 {
@@ -10,6 +14,10 @@ void setupActuators()
     pinMode(IN2, OUTPUT);
     pinMode(IN3, OUTPUT);
     pinMode(IN4, OUTPUT);
+
+    // Servo
+    leftServo.attach(LEFT_SERVO);
+    rightServo.attach(RIGHT_SERVO);
 }
 
 int convertPercentageToPWM(int value)
@@ -20,6 +28,15 @@ int convertPercentageToPWM(int value)
      * @param int percentage
      * @return int PWM value
      */
+
+    if (value > 75)
+    {
+        value = 75;
+    }
+    else if (value < -75)
+    {
+        value = -75;
+    }
 
     return value * 255 / 100;
 }
@@ -95,16 +112,55 @@ void turnLeftUntilCenter()
     }
 }
 
-void turn360UntilCenter()
+void turn360LeftUntilCenter()
 {
     uint32_t time_start = millis();
     while (millis() - time_start < 1000)
     {
-        controlSpeed(-100, 100);
+        controlSpeed(50, -50);
     }
 
-    while (readCenterIRData() != 1 && readCenterIRData() != 3)
+    while (readCenterIRData() != 1 && readCenterIRData() != 2)
     {
-        controlSpeed(-75, 75);
+        controlSpeed(45, -45);
     }
+}
+
+void turn360RightUntilCenter()
+{
+    uint32_t time_start = millis();
+    while (millis() - time_start < 1000)
+    {
+        controlSpeed(-50, 65);
+    }
+
+    while (readCenterIRData() != 3 && readCenterIRData() != 4)
+    {
+        controlSpeed(-45, 65);
+    }
+}
+
+// SERVO MOTOR FUNCTIONS
+void controlServo(int leftAngle = 0, int rightAngle = 0)
+{
+    /**
+     * Control the servo motor.
+     *
+     * @param int left angle
+     * @param int right angle
+     */
+
+    if (leftAngle > 180)
+        leftAngle = 180;
+    else if (leftAngle < 0)
+        leftAngle = 0;
+
+    if (rightAngle > 180)
+        rightAngle = 180;
+    else if (rightAngle < 0)
+        rightAngle = 0;
+
+    // Push data
+    leftServo.write(leftAngle);
+    rightServo.write(rightAngle);
 }

@@ -1,69 +1,64 @@
 #include "alexander.h"
 #include "constants.cpp"
 
-/**
- * Last found line:
- * -1 - left but so-so
- * 0 - center
- * 1 - right but so-so
- */
-int lastFound = 0;
+int lastError = 0;
+const float Kp = 1.3;
+const float Kd = 1;
 
-void basicLineFollower()
+void basicLineFollower(int baseSpeed = 45)
 {
+    int error;
+
     if (readUltrasonicData() < 20)
     {
         controlSpeed(0, 0);
         return;
     }
 
-    if (!readMiddleLeftIRData() && !readCenterIRData() && !readMiddleRightIRData())
+    if (
+        !readMiddleLeftIRData() &&
+        !readCenterIRData() &&
+        !readMiddleRightIRData())
     {
-        if (lastFound == -1)
-        {
-            controlSpeed(0, 50);
-        }
-        else if (lastFound == 0)
-        {
-            controlSpeed(50, 50);
-        }
-        else if (lastFound == 1)
-        {
-            controlSpeed(50, 0);
-        }
-    }
-
-    // Belok kiri setengah-setengah
-    else if (readMiddleLeftIRData() && !readRightIRData())
-    {
-        lastFound = -1;
-        controlSpeed(0, 50);
-    }
-
-    // Belok kanan setengah-setengah
-    else if (!readLeftIRData() && readMiddleRightIRData())
-    {
-        lastFound = 1;
-        controlSpeed(50, 0);
+        error = lastError;
     }
 
     // Lurus
     else if (readCenterIRData())
     {
-        lastFound = 0;
         if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
-        {
-            controlSpeed(50, 50);
-        }
+            error = 0;
         else if (readCenterIRData() == 2)
-        {
-            controlSpeed(0, 50);
-        }
+            error = -10;
         else if (readCenterIRData() == 4)
-        {
-            controlSpeed(50, 0);
-        }
+            error = 10;
     }
+
+    // Kiri tengah
+    else if (readMiddleLeftIRData() && !readRightIRData())
+    {
+        error = -30;
+    }
+
+    // Kanan tengah
+    else if (!readLeftIRData() && readMiddleRightIRData())
+    {
+        error = 30;
+    }
+
+    // Calculate derivative of the error
+    int DError = error - lastError;
+
+    // Calculate additional speed needed
+    float additionalSpeed = Kp * error + Kd * DError;
+
+    if (error == 0)
+        controlSpeed(55, 55);
+    else
+        controlSpeed(baseSpeed + additionalSpeed, baseSpeed - additionalSpeed);
+
+    // Save current error as last error
+    lastError = error;
 }
 
 void find_line(int type, int pass_through = 1)
