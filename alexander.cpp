@@ -1,20 +1,11 @@
 #include "alexander.h"
 #include "constants.cpp"
 
-/**
- * Last found line:
- * -2 - left
- * -1 - left but so-so
- * 0 - center
- * 1 - right but so-so
- * 2 - right
- */
-int lastFound = 0;
 int lastError = 0;
-const int Kp = 2;
-const int Kd = 0;
+const float Kp = 1.3;
+const float Kd = 1;
 
-void basicLineFollower(int baseSpeed = 50)
+void basicLineFollower(int baseSpeed = 45)
 {
     int error;
 
@@ -24,82 +15,50 @@ void basicLineFollower(int baseSpeed = 50)
         return;
     }
 
-    if (!readLeftIRData() && !readMiddleLeftIRData() && !readCenterIRData() && !readMiddleRightIRData() && !readRightIRData())
+    if (
+        !readMiddleLeftIRData() &&
+        !readCenterIRData() &&
+        !readMiddleRightIRData())
     {
-        if (lastFound == 2)
-        {
-            controlSpeed(-50, 50);
-        }
-        else if (lastFound == -1)
-        {
-            controlSpeed(0, 50);
-        }
-        else if (lastFound == 0)
-        {
-            controlSpeed(50, 50);
-        }
-        else if (lastFound == 1)
-        {
-            controlSpeed(50, 0);
-        }
-        else if (lastFound == 2)
-        {
-            controlSpeed(50, -50);
-        }
+        error = lastError;
     }
-    else
+
+    // Lurus
+    else if (readCenterIRData())
     {
-        // Lurus
-        if (readCenterIRData())
-        {
-            lastFound = 0;
+        if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
+            error = 0;
+        else if (readCenterIRData() == 2)
+            error = -10;
+        else if (readCenterIRData() == 4)
+            error = 10;
+    }
 
-            if (readCenterIRData() == 1 || readCenterIRData() == 3 || readCenterIRData() == 5)
-                error = 0;
-            else if (readCenterIRData() == 2)
-                error = -10;
-            else if (readCenterIRData() == 4)
-                error = 10;
-        }
+    // Kiri tengah
+    else if (readMiddleLeftIRData() && !readRightIRData())
+    {
+        error = -30;
+    }
 
-        // Kiri pojok
-        else if (readLeftIRData() && !readRightIRData())
-        {
-            lastFound = -2;
-            error = -50;
-        }
+    // Kanan tengah
+    else if (!readLeftIRData() && readMiddleRightIRData())
+    {
+        error = 30;
+    }
 
-        // Kiri tengah
-        else if (readMiddleLeftIRData() && !readRightIRData())
-        {
-            lastFound = -1;
-            error = -25;
-        }
+    // Calculate derivative of the error
+    int DError = error - lastError;
 
-        // Kanan tengah
-        else if (!readLeftIRData() && readMiddleRightIRData())
-        {
-            lastFound = 1;
-            error = 25;
-        }
+    // Calculate additional speed needed
+    float additionalSpeed = Kp * error + Kd * DError;
 
-        // Kanan pojok
-        else if (readLeftIRData() && !readRightIRData())
-        {
-            lastFound = 2;
-            error = 50;
-        }
-
-        // Calculate derivative of the error
-        int DError = error - lastError;
-
-        // Calculate additional speed needed
-        int additionalSpeed = Kp * error + Kd * DError;
+    if (error == 0)
+        controlSpeed(55, 55);
+    else
         controlSpeed(baseSpeed + additionalSpeed, baseSpeed - additionalSpeed);
 
-        // Save current error as last error
-        int lastError = error;
-    }
+    // Save current error as last error
+    lastError = error;
 }
 
 void find_line(int type, int pass_through = 1)
