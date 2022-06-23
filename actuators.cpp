@@ -21,6 +21,15 @@ int convertPercentageToPWM(int value)
      * @return int PWM value
      */
 
+    if (value > 75)
+    {
+        value = 75;
+    }
+    else if (value < -75)
+    {
+        value = -75;
+    }
+
     return value * 255 / 100;
 }
 
