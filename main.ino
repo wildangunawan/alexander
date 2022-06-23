@@ -38,20 +38,31 @@ void loop()
 
   // Find last T-Junction, kanan ke trolley, kiri ke jalanan biasa
   find_line(T_JUNCTION, 0);
-  controlSpeed(0, 0);
-  delay(300);
 
   // If not pulled then we grab the trolley first
   if (!trolley_pulled)
   {
-    turnRightUntilCenter();
+    turnLeftUntilCenter();
+    int start = millis();
+
+    while (millis() - start < 1500)
+    {
+      basicLineFollower();
+    }
+
+    turn360LeftUntilCenter();
 
     // Go find trolley
+    find_line(RIGHT_JUNCTION);
     find_line(T_JUNCTION, 0);
-    turn360UntilCenter();
+    controlSpeed(0, 0);
+    delay(300);
+    turn360RightUntilCenter();
 
     // Grab trolley, somehow
     // grabTrolley();
+    controlSpeed(0, 0);
+    delay(3000);
     trolley_pulled = 1;
 
     // Jalan biasa lagi. Akan ada satu left junction ke home, kita skip itu ya
@@ -71,7 +82,5 @@ void loop()
 
   // Kita kembali ke awal lagi, find Left Junction dekat home
   find_line(LEFT_JUNCTION, 0);
-  controlSpeed(0, 0);
-  delay(1000);
   turnLeftUntilCenter();
 }
