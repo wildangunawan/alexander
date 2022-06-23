@@ -18,12 +18,12 @@ const int ENA = 5; // speed control motor A
 const int ENB = 6; // speed control motor B
 const int IN1 = 8;
 const int IN2 = 9;
-const int IN3 = 10;
-const int IN4 = 11;
+const int IN3 = A5;
+const int IN4 = A4;
 
 // servo
-const int LEFT_SERVO = A4;
-const int RIGHT_SERVO = A5;
+const int LEFT_SERVO = 11;
+const int RIGHT_SERVO = 10;
 
 // types
 const int T_JUNCTION = 1;
