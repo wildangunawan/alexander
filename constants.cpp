@@ -21,6 +21,10 @@ const int IN2 = 9;
 const int IN3 = 10;
 const int IN4 = 11;
 
+// servo
+const int LEFT_SERVO = A4;
+const int RIGHT_SERVO = A5;
+
 // types
 const int T_JUNCTION = 1;
 const int LEFT_JUNCTION = 2;
