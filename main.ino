@@ -21,58 +21,65 @@ void loop()
     find_line(T_JUNCTION);
     controlSpeed(0, 0);
     delay(300);
-    dari_home = 0;
 
     // Selanjutnya, kita akan ketemu Right Junction dan belok ke kanan
     find_line(RIGHT_JUNCTION, 0);
     controlSpeed(0, 0);
     delay(300);
     turnRightUntilCenter();
+    dari_home = 0;
   }
 
   // Sudah masuk ke daerah perempatan, kita cari T-Junction sebanyak 5x
   for (int i = 0; i < 5; i++)
   {
     find_line(T_JUNCTION);
+    controlSpeed(0, 0);
+    delay(100);
   }
 
   // Find last T-Junction, kanan ke trolley, kiri ke jalanan biasa
   find_line(T_JUNCTION, 0);
+  controlSpeed(0, 0);
+  delay(300);
+  turnLeftUntilCenter();
 
   // If not pulled then we grab the trolley first
   if (!trolley_pulled)
   {
-    turnLeftUntilCenter();
     int start = millis();
 
-    while (millis() - start < 1500)
+    while (millis() - start < 2500)
     {
       basicLineFollower();
     }
 
-    turn360LeftUntilCenter();
+    turn360UntilCenter();
 
     // Go find trolley
     find_line(RIGHT_JUNCTION);
-    find_line(T_JUNCTION, 0);
+    controlSpeed(50, 50);
+    delay(750);
+
+    // Putar balik
+    turn360UntilCenter();
+    turn360UntilCenter(100);
+
+    // Bernafas dulu
     controlSpeed(0, 0);
     delay(300);
-    turn360RightUntilCenter();
 
-    // Grab trolley, somehow
-    // grabTrolley();
+    // Mundur
+    controlSpeed(-100, -99);
+    delay(300);
     controlSpeed(0, 0);
-    delay(3000);
+
+    // Grab trolley
+    grabTrolley();
     trolley_pulled = 1;
 
     // Jalan biasa lagi. Akan ada satu left junction ke home, kita skip itu ya
     find_line(LEFT_JUNCTION);
-  }
-
-  // Else we run as usual in the arena
-  else
-  {
-    turnLeftUntilCenter();
   }
 
   // Di jalanan biasa, akan ada 2x Left Junction dan 1x Right Junction
