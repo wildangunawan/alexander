@@ -2,8 +2,8 @@
 #include "constants.cpp"
 
 int lastError = 0;
-const float Kp = 1.3;
-const float Kd = 1;
+const float Kp = 1.4;
+const float Kd = 1.1;
 
 void basicLineFollower(int baseSpeed = 45)
 {
