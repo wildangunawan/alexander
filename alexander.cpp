@@ -131,3 +131,16 @@ void find_line(int type, int pass_through = 1)
         }
     }
 }
+
+void grabTrolley()
+{
+    // Operate servo
+    controlServo(120, 60);
+    delay(300);
+
+    // Mundur sedikit
+    controlSpeed(-50, -50);
+    delay(200);
+    controlSpeed(0, 0);
+    delay(500);
+}
