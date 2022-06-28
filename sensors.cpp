@@ -132,7 +132,10 @@ int readUltrasonicData()
     digitalWrite(trigPin, LOW);
 
     // Get duration of the pulse
-    long duration = pulseIn(echoPin, HIGH);
+    long duration = pulseIn(echoPin, HIGH, 2000UL);
+
+    if (duration == 0)
+        return 999;
 
     // Calculate distance in cm
     int distanceCm = duration * 0.034 / 2;
