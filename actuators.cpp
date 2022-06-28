@@ -18,6 +18,9 @@ void setupActuators()
     // Servo
     leftServo.attach(LEFT_SERVO);
     rightServo.attach(RIGHT_SERVO);
+
+    // Reset servo
+    controlServo(180, 0);
 }
 
 int convertPercentageToPWM(int value)
